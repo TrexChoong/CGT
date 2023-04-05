@@ -73,7 +73,8 @@ public abstract class Consumable : MonoBehaviour
             m_ParticleSpawned.transform.SetParent(c.characterCollider.transform);
             m_ParticleSpawned.transform.localPosition = op.Result.transform.position;
         }
-	}
+        //Debug.Log(GetConsumableType());
+    }
 
     IEnumerator TimedRelease(GameObject obj, float time)
     {

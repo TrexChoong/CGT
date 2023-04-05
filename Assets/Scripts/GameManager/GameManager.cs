@@ -1,5 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
+using System.Collections;
+using System.IO;
 #if UNITY_ANALYTICS
 using UnityEngine.Analytics;
 #endif
@@ -9,6 +11,7 @@ using UnityEngine.Analytics;
 /// </summary>
 public class GameManager : MonoBehaviour
 {
+    
     static public GameManager instance { get { return s_Instance; } }
     static protected GameManager s_Instance;
 
@@ -19,6 +22,28 @@ public class GameManager : MonoBehaviour
 
     protected List<AState> m_StateStack = new List<AState>();
     protected Dictionary<string, AState> m_StateDict = new Dictionary<string, AState>();
+
+
+    protected CharacterInputController charactercontroller;
+    protected GameObject playerPivot;
+    protected Consumable consumables;
+    protected Dictionary<Consumable.ConsumableType, int> countPowerups = new Dictionary<Consumable.ConsumableType, int>();
+    protected ConsumableDatabase consumableDatabase;
+
+    static string filename = "";
+    static bool running;
+    static protected float speed;
+    static protected float score;
+    static protected int coins;
+    static protected float distance;
+    static protected bool ReRunning;
+    protected int noOfItems;
+    protected Consumable.ConsumableType coinMag;
+    protected Consumable.ConsumableType scoreMulti;
+    protected Consumable.ConsumableType invincibility;
+    protected Consumable.ConsumableType extraLife;
+    protected Consumable.ConsumableType consumableType;
+
 
     protected void OnEnable()
     {
@@ -43,14 +68,46 @@ public class GameManager : MonoBehaviour
         m_StateStack.Clear();
 
         PushState(states[0].GetName());
+
+        // Name the file "/test.csv" and write the headings at the beginning
+        filename = Application.dataPath + "/test.csv";
+        File.WriteAllText(filename, "Speed, Score, Coins, Total Distance" + System.Environment.NewLine);        
+    }
+
+    // Will do the saving function on every seconds declared
+    static public IEnumerator saveRecord()
+    {
+        running = true;
+        while (running)
+        {
+            recordTime();
+            yield return new WaitForSeconds(10);
+        }        
+    }
+
+    // Records the necessary variables to the test file 
+    static protected void recordTime()
+    {
+        Debug.Log("Speed = " + speed);
+        Debug.Log("Score = " + score);
+        Debug.Log("Coins = " + coins);
+        Debug.Log("Total Distance = " + distance);
+
+        WriteCSV();
     }
 
     protected void Update()
     {
         if(m_StateStack.Count > 0)
-        {
+        {          
             m_StateStack[m_StateStack.Count - 1].Tick();
         }
+        speed = TrackManager.instance.speed;
+        score = TrackManager.instance.score;
+        playerPivot = GameObject.Find("PlayerPivot");
+        charactercontroller = playerPivot.GetComponent<CharacterInputController>();
+        coins = charactercontroller.coins;
+        distance = TrackManager.instance.worldDistance;
     }
 
     protected void OnApplicationQuit()
@@ -128,6 +185,13 @@ public class GameManager : MonoBehaviour
         }
         m_StateStack.Add(state);
     }
+
+    // Writes the values of the essential variables into the test file
+    static public void WriteCSV()
+    {
+        File.AppendAllText(filename, speed + "," + score + "," + coins + "," + distance + System.Environment.NewLine);
+    }
+
 }
 
 public abstract class AState : MonoBehaviour

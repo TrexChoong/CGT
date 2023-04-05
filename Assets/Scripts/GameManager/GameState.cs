@@ -378,7 +378,7 @@ public class GameState : AState
 	{
 		m_Finished = true;
 		trackManager.StopMove();
-
+        
         // Reseting the global blinking value. Can happen if game unexpectly exited while still blinking
         Shader.SetGlobalFloat("_BlinkingValue", 0.0f);
 

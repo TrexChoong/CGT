@@ -22,7 +22,7 @@ public class GameOverState : AState
     public GameObject addButton;
 
     public override void Enter(AState from)
-    {
+    {        
         canvas.gameObject.SetActive(true);
 
 		miniLeaderboard.playerEntry.inputName.text = PlayerData.instance.previousName;

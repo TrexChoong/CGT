@@ -125,12 +125,13 @@ public class CharacterInputController : MonoBehaviour
 		characterCollider.Init ();
 
 		m_ActiveConsumables.Clear();
+		
 	}
 
 	public void End()
 	{
         CleanConsumable();
-    }
+	}
 
     public void CleanConsumable()
     {
@@ -166,7 +167,7 @@ public class CharacterInputController : MonoBehaviour
         {
             character.animator.SetBool(s_MovingHash, false);
         }
-    }
+	}
 
     protected bool TutorialMoveCheck(int tutorialLevel)
     {
@@ -422,6 +423,7 @@ public class CharacterInputController : MonoBehaviour
         c.gameObject.SetActive(false);
 
         m_ActiveConsumables.Add(c);
-        StartCoroutine(c.Started(this));
+		
+        StartCoroutine(c.Started(this));		
     }
 }

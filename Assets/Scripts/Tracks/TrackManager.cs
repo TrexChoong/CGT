@@ -128,7 +128,7 @@ public class TrackManager : MonoBehaviour
     protected const int k_DesiredSegmentCount = 10;
     protected const float k_SegmentRemovalDistance = -30f;
     protected const float k_Acceleration = 0.2f;
-    
+
     protected void Awake()
     {
         m_ScoreAccum = 0.0f;
@@ -141,6 +141,7 @@ public class TrackManager : MonoBehaviour
         m_IsMoving = true;
         if (isRestart)
             m_Speed = minSpeed;
+
     }
 
     public void StopMove()
@@ -170,6 +171,8 @@ public class TrackManager : MonoBehaviour
 
         characterController.StartRunning();
         StartMove();
+        // Start saving the data after the countdown
+        CoroutineHandler.StartStaticCoroutine(GameManager.saveRecord());
     }
 
     public IEnumerator Begin()
@@ -254,6 +257,8 @@ public class TrackManager : MonoBehaviour
         characterController.Begin();
         StartCoroutine(WaitToStart());
         isLoaded = true;
+
+
     }
 
     public void End()
