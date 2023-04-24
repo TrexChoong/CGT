@@ -71,7 +71,8 @@ public class GameManager : MonoBehaviour
 
         // Name the file "/test.csv" and write the headings at the beginning
         filename = Application.dataPath + "/test.csv";
-        File.WriteAllText(filename, "Speed, Score, Coins, Total Distance" + System.Environment.NewLine);        
+        //File.WriteAllText(filename, "Speed, Score, Coins, Total Distance" + System.Environment.NewLine);  
+        File.ReadAllText(filename);      
     }
 
     // Will do the saving function on every seconds declared
