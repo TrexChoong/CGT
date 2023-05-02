@@ -19,6 +19,7 @@ public class GameManager : MonoBehaviour
     public AState topState {  get { if (m_StateStack.Count == 0) return null; return m_StateStack[m_StateStack.Count - 1]; } }
 
     public ConsumableDatabase m_ConsumableDatabase;
+    public MultipleLinearRegression regressionManager;
 
     protected List<AState> m_StateStack = new List<AState>();
     protected Dictionary<string, AState> m_StateDict = new Dictionary<string, AState>();
@@ -97,18 +98,31 @@ public class GameManager : MonoBehaviour
         WriteCSV();
     }
 
+    protected void Start(){
+        Debug.Log("Call Start"+ regressionManager);
+        regressionManager.LoadDataFromCSV(filename);
+    }
+
     protected void Update()
     {
+        //regressionManager.CheckTest();
         if(m_StateStack.Count > 0)
         {          
             m_StateStack[m_StateStack.Count - 1].Tick();
         }
-        speed = TrackManager.instance.speed;
-        score = TrackManager.instance.score;
-        playerPivot = GameObject.Find("PlayerPivot");
-        charactercontroller = playerPivot.GetComponent<CharacterInputController>();
-        coins = charactercontroller.coins;
-        distance = TrackManager.instance.worldDistance;
+        if(TrackManager.instance != null){
+            speed = TrackManager.instance.speed;
+            score = TrackManager.instance.score;
+            playerPivot = GameObject.Find("PlayerPivot");
+            charactercontroller = playerPivot.GetComponent<CharacterInputController>();
+            coins = charactercontroller.coins;
+            distance = TrackManager.instance.worldDistance;
+            float[] dataset = new float[3];
+            dataset[0] = speed;
+            dataset[1] = score;
+            dataset[2] = coins;
+            Debug.Log("successful call:" + regressionManager.Predict(dataset).ToString());   
+        }
     }
 
     protected void OnApplicationQuit()
@@ -134,6 +148,8 @@ public class GameManager : MonoBehaviour
         {
             Debug.LogError("Can't find the state named " + newState);
             return;
+        } else if (state.GetName() == "GameOver"){
+            running = false;
         }
 
         m_StateStack[m_StateStack.Count - 1].Exit(state);
