@@ -38,13 +38,16 @@ public class GameManager : MonoBehaviour
     static protected int coins;
     static protected float distance;
     static protected bool ReRunning;
+    protected float[] dataset;
+    static protected float predictedSpeed;
     protected int noOfItems;
     protected Consumable.ConsumableType coinMag;
     protected Consumable.ConsumableType scoreMulti;
     protected Consumable.ConsumableType invincibility;
     protected Consumable.ConsumableType extraLife;
     protected Consumable.ConsumableType consumableType;
-
+    protected float increment = 0.1f;
+    protected float maxSpeed = 10f;
 
     protected void OnEnable()
     {
@@ -73,7 +76,8 @@ public class GameManager : MonoBehaviour
         // Name the file "/test.csv" and write the headings at the beginning
         filename = Application.dataPath + "/test.csv";
         //File.WriteAllText(filename, "Speed, Score, Coins, Total Distance" + System.Environment.NewLine);  
-        File.ReadAllText(filename);      
+        File.ReadAllText(filename);
+        
     }
 
     // Will do the saving function on every seconds declared
@@ -98,8 +102,18 @@ public class GameManager : MonoBehaviour
         WriteCSV();
     }
 
+    //protected IEnumerator ChangeSpeed()
+    //{
+    //    running = true;
+    //    while (running)
+    //    {
+    //        speed = regressionManager.Predict(dataset);
+    //        yield return new WaitForSeconds(0.1f);
+    //    }
+    //}
+
     protected void Start(){
-        Debug.Log("Call Start"+ regressionManager);
+        Debug.Log("Call Start "+ regressionManager);
         regressionManager.LoadDataFromCSV(filename);
     }
 
@@ -117,12 +131,12 @@ public class GameManager : MonoBehaviour
             charactercontroller = playerPivot.GetComponent<CharacterInputController>();
             coins = charactercontroller.coins;
             distance = TrackManager.instance.worldDistance;
-            float[] dataset = new float[3];
+            dataset = new float[3];
             dataset[0] = speed;
             dataset[1] = score;
             dataset[2] = coins;
-            Debug.Log("successful call:" + regressionManager.Predict(dataset).ToString());   
-        }
+            //Debug.Log("successful call:" + regressionManager.Predict(dataset).ToString());              
+        }       
     }
 
     protected void OnApplicationQuit()
