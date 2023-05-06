@@ -70,7 +70,9 @@ public class GameManager : MonoBehaviour
 
         // Name the file "/test.csv" and write the headings at the beginning
         filename = Application.dataPath + "/test.csv";
+        //filename = Application.dataPath + "/test2.csv";
         //File.WriteAllText(filename, "Speed, Score, Coins, Total Distance" + System.Environment.NewLine);  
+        
         File.ReadAllText(filename);
         
     }
@@ -97,14 +99,14 @@ public class GameManager : MonoBehaviour
         WriteCSV();
     }
 
-    protected IEnumerator ChangeSpeed()
-    {
-        while (running)
-        {
-            speed = regressionManager.Predict(dataset);
-            yield return new WaitForSeconds(2f);
-        }
-    }
+    //protected IEnumerator ChangeSpeed()
+    //{
+    //    while (running)
+    //    {
+    //        speed = regressionManager.Predict(dataset);
+    //        yield return new WaitForSeconds(2f);
+    //    }
+    //}
 
     protected void Start(){
         Debug.Log("Call Start "+ regressionManager);
@@ -129,9 +131,9 @@ public class GameManager : MonoBehaviour
             dataset[0] = speed;
             dataset[1] = score;
             dataset[2] = coins;
-            StartCoroutine(ChangeSpeed());
+            //StartCoroutine(ChangeSpeed());
             //Debug.Log("successful call: " + regressionManager.Predict(dataset));
-            Debug.Log("Speed: " + speed);
+            //Debug.Log("Speed: " + speed);
         }       
     }
 
