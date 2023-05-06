@@ -40,14 +40,9 @@ public class GameManager : MonoBehaviour
     static protected bool ReRunning;
     protected float[] dataset;
     static protected float predictedSpeed;
-    protected int noOfItems;
-    protected Consumable.ConsumableType coinMag;
-    protected Consumable.ConsumableType scoreMulti;
-    protected Consumable.ConsumableType invincibility;
-    protected Consumable.ConsumableType extraLife;
-    protected Consumable.ConsumableType consumableType;
-    protected float increment = 0.1f;
-    protected float maxSpeed = 10f;
+
+    static protected float increment = 2f;
+    static protected float maxSpeed = 50f;
 
     protected void OnEnable()
     {
@@ -102,15 +97,14 @@ public class GameManager : MonoBehaviour
         WriteCSV();
     }
 
-    //protected IEnumerator ChangeSpeed()
-    //{
-    //    running = true;
-    //    while (running)
-    //    {
-    //        speed = regressionManager.Predict(dataset);
-    //        yield return new WaitForSeconds(0.1f);
-    //    }
-    //}
+    protected IEnumerator ChangeSpeed()
+    {
+        while (running)
+        {
+            speed = regressionManager.Predict(dataset);
+            yield return new WaitForSeconds(2f);
+        }
+    }
 
     protected void Start(){
         Debug.Log("Call Start "+ regressionManager);
@@ -135,7 +129,9 @@ public class GameManager : MonoBehaviour
             dataset[0] = speed;
             dataset[1] = score;
             dataset[2] = coins;
-            //Debug.Log("successful call:" + regressionManager.Predict(dataset).ToString());              
+            StartCoroutine(ChangeSpeed());
+            //Debug.Log("successful call: " + regressionManager.Predict(dataset));
+            Debug.Log("Speed: " + speed);
         }       
     }
 
