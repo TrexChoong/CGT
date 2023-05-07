@@ -84,6 +84,9 @@ public class TrackManager : MonoBehaviour
     public bool isLoaded { get; set; }
     //used by the obstacle spawning code in the tutorial, as it need to spawn the 1st obstacle in the middle lane
     public bool firstObstacle { get; set; }
+    
+    public float predictedSpeed { get { return m_predictedSpeed; } set { m_predictedSpeed = value; } }
+    public bool isDynamic { get { return m_IsDynamic; } set { m_IsDynamic = value; } }
 
     protected float m_TimeToStart = -1.0f;
 
@@ -115,6 +118,8 @@ public class TrackManager : MonoBehaviour
     protected bool m_Rerun;     // This lets us know if we are entering a game over (ads) state or starting a new game (see GameState)
 
     protected bool m_IsTutorial; //Tutorial is a special run that don't chance section until the tutorial step is "validated" by the TutorialState.
+    protected bool m_IsDynamic; //Dynamic is for dynamic difficulty adjustment.
+    protected float m_predictedSpeed; // The speed
     
     Vector3 m_CameraOriginalPos = Vector3.zero;
     
@@ -440,10 +445,16 @@ public class TrackManager : MonoBehaviour
 
         if (!m_IsTutorial)
         {
-            if (m_Speed < maxSpeed)
-                m_Speed += k_Acceleration * Time.deltaTime;
-            else
-                m_Speed = maxSpeed;
+            if(!m_IsDynamic){
+                if (m_Speed < maxSpeed)
+                    m_Speed += k_Acceleration * Time.deltaTime;
+                else
+                    m_Speed = maxSpeed;
+            } else {
+                // replace speed acceleration with predicted speed
+                m_Speed = m_predictedSpeed;
+                // TODO: move speed prediction to coroutine
+            }
         }
 
         m_Multiplier = 1 + Mathf.FloorToInt((m_Speed - minSpeed) / (maxSpeed - minSpeed) * speedStep);

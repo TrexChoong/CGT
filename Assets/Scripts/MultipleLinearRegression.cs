@@ -21,6 +21,9 @@ public class MultipleLinearRegression : MonoBehaviour
     public List<float> yValues = new List<float>();
     public float[] m_coefficients;
 
+    private double[] theta; // Parameters learned by the model
+    public List<double[]> xAlter = new List<double[]>();
+    public List<double> yAlter = new List<double>();
     public void LoadDataFromCSV(string filePath)
     {
         Debug.Log("Trigger file start");
@@ -29,29 +32,38 @@ public class MultipleLinearRegression : MonoBehaviour
         while (!reader.EndOfStream)
         {
             string[] line = reader.ReadLine().Split(',');
-            Debug.Log("Trigger row input raw: " + line[0]);
-            Debug.Log("Trigger row input raw: " + line[1]);
-            Debug.Log("Trigger row input raw: " + line[2]);
-            Debug.Log("Trigger row input raw: " + line[3]);
+            // Debug.Log("Trigger row input raw: " + line[0]);
+            // Debug.Log("Trigger row input raw: " + line[1]);
+            // Debug.Log("Trigger row input raw: " + line[2]);
+            // Debug.Log("Trigger row input raw: " + line[3]);
             float[] x = new float[line.Length - 1];
-            Debug.Log("Trigger row size: " + line.Length);
+            double[] xAltercase = new double[line.Length-1];
+            //Debug.Log("Trigger row size: " + line.Length);
             //for (int i = 0; i < line.Length - 1; i++)
-            for (int i = 0; i < line.Length - 1; i++)
+            for (int i = 1; i < line.Length - 1; i++)
             
             {
-                Debug.Log("Trigger file input: " + line[i] +" "+ i);
+                //Debug.Log("Trigger file input: " + line[i] +" "+ i);
                 x[i] = float.Parse(line[i]);
+                xAltercase[i] = double.Parse(line[i]);
             }
-            float y = float.Parse(line[line.Length - 1]);
+            float y = float.Parse(line[0]);
+            float yAltercase = float.Parse(line[0]);
             xValues.Add(x);
             yValues.Add(y);
+
+            xAlter.Add(xAltercase);
+            yAlter.Add(yAltercase);
         }
-        Debug.Log("Trigger file process");
-        CalculateCoefficients(xValues, yValues);
+        reader.Dispose();
+        TrainModel(xAlter, yAlter);
     }
 
     public void CalculateCoefficients(List<float[]> xValues, List<float> yValues)
     {
+        Debug.Log("check xvalues:" + xValues[0].ToString());
+        Debug.Log("check xvalues1:" + xValues[1]);
+        Debug.Log("check xvalues2:" + xValues[2]);
         // Calculate the means of the independent variables.
         //float[] x1 = xValues[0];
         //float[] x2 = xValues[1];
@@ -121,77 +133,102 @@ public class MultipleLinearRegression : MonoBehaviour
 
         float[] coefficientArray = { b1, b2, b3, a};
         m_coefficients = coefficientArray;
-        Debug.Log("CALCULATE COEFFICIENTS");
-        Debug.Log("x1 = " + x1[1]);
-        Debug.Log("x2 = " + x2[1]);
-        Debug.Log("x3 = " + x3[1]);
-        Debug.Log("Y = " + y[1]);
-        Debug.Log("b1 = " + coefficientArray[0]);
-        Debug.Log("b2 = " + coefficientArray[1]);
-        Debug.Log("b3 = " + coefficientArray[2]);
-        Debug.Log("a = " + coefficientArray[3]);
-        Debug.Log("Mean of Y = " + meanY);
+        // Debug.Log("CALCULATE COEFFICIENTS");
+        // Debug.Log("x1 = " + x1[1]);
+        // Debug.Log("x2 = " + x2[1]);
+        // Debug.Log("x3 = " + x3[1]);
+        // Debug.Log("Y = " + y[1]);
+        // Debug.Log("b1 = " + coefficientArray[0]);
+        // Debug.Log("b2 = " + coefficientArray[1]);
+        // Debug.Log("b3 = " + coefficientArray[2]);
+        // Debug.Log("a = " + coefficientArray[3]);
+        // Debug.Log("Mean of Y = " + meanY);
     }
 
-    //public void CalculateCoefficients(List<float[]> xValues, List<float> yValues)
-    //{
-    //    // int numberOfDataPoints = yValues.Count;
-    //    // int numberOfIndependentVariables = xValues[0].Length;
-    //    // Matrix4x4 xMatrix = new Matrix4x4();
-    //    // Vector4 yVector = new Vector4();
+    // Trains the model on the given input data
+    public void TrainModel(List<double[]> inputs, List<double> outputs, double learningRate = 0.01, int numIterations = 100)
+    {
+        int n = inputs.Count; // Number of data points
+        int p = inputs[0].Length; // Number of input features
 
-    //    // Debug.Log("Trigger calculate start");
-    //    // // Fill the xMatrix and yVector with the provided values
-    //    // for (int i = 0; i < numberOfDataPoints; i++)
-    //    // {
-    //    // Debug.Log("Trigger calculate loop a" );
-    //    // //     for (int j = 0; j < numberOfIndependentVariables; j++)
-    //    // //     {
-    //    // // Debug.Log("Trigger calculate loop b " + i);
-    //    // // Debug.Log("TEST VALUE " + i);
-    //    // //         //xMatrix[i, j] = xValues[i, j];
-    //    // //     }
+        // Add a column of 1s to the beginning of the input matrix for the intercept term
+        double[][] X = new double[n][];
+        for (int i = 0; i < n - 1; i++)
+        {
+            X[i] = new double[p + 1];
+            X[i][0] = 1;
+            for (int j = 0; j < p; j++)
+            {
+                X[i][j + 1] = inputs[i][j];
+                //Debug.Log("input index = " + i +" "+ j);
+            }
+        }
 
-    //    // // Debug.Log("TEST VALUE " + xValues[0][0]);
-    //    // // Debug.Log("TEST VALUE 2" + xValues[0][1]);
-    //    // // Debug.Log("TEST VALUE 3" + xValues[0][2]);
-    //    // // Debug.Log("TEST VALUE 4" + xValues[0][3]);
-    //    // Vector4 container = new Vector4(xValues[i][0],xValues[i][1],xValues[i][2], yValues[i]);
-    //    // xMatrix.SetRow(i,container);
-    //    // Debug.Log("Trigger loop :"+ i);
-    //    //     xMatrix[i, numberOfIndependentVariables] = 1;
-    //    // Debug.Log("Trigger loop :"+ i);
-    //    //     yVector[i] = yValues[i];
-    //    // }
+        // Initialize the parameters
+        theta = new double[p + 1];
 
-    //    // // Calculate the coefficients using matrix algebra
-    //    // Matrix4x4 xMatrixTranspose = xMatrix.transpose;
-    //    // Debug.Log("Trigger calculate a:" + xMatrixTranspose.ToString());
-    //    // Matrix4x4 xMatrixInverse = xMatrixTranspose * xMatrix;
-    //    // Debug.Log("Trigger calculate b:" + xMatrixInverse.ToString());
-    //    // Vector4 xTy = xMatrixTranspose * yVector;
-    //    // Debug.Log("Trigger calculate c:" + xTy.ToString());
-    //    // Vector4 coefficients = xMatrixInverse.inverse * xTy;
-    //    // Debug.Log("Trigger calculate d:" + coefficients.ToString());
+        // Perform gradient descent
+        for (int iter = 0; iter < numIterations; iter++)
+        {
+            // Compute the predicted outputs and errors
+            double[] predictions = new double[n];
+            double[] errors = new double[n];
+            for (int i = 0; i < n - 10; i++)
+            {
+                double prediction = 0;
+                for (int j = 0; j < p + 1; j++)
+                {
+                    prediction += X[i][j] * theta[j];
+                }
+                predictions[i] = prediction;
+                errors[i] = prediction - outputs[i];
+            }
 
-    //    // // Convert the coefficients to float array and return
-    //    // float[] coefficientsArray = { coefficients.x, coefficients.y, coefficients.z, coefficients.w };
-    //    // m_coefficients = coefficientsArray;
-    //    // return coefficientsArray;
-    //    Debug.Log("CALCULATE COEFFICIENTS");
-    //}
+            // Update the parameters
+            double[] gradients = new double[p + 1];
+            for (int j = 0; j < p + 1; j++)
+            {
+                double gradient = 0;
+                for (int i = 0; i < n - 10; i++)
+                {
+                    gradient += errors[i] * X[i][j];
+                }
+                gradients[j] = gradient / (n - 10);
+            }
+            for (int j = 0; j < p + 1; j++)
+            {
+                theta[j] -= learningRate * gradients[j];
+            }
+        }
+    }
 
     public float Predict(float[] x)
     {
         float y = 0;
         if(m_coefficients.Length>0){
-            y = m_coefficients[0];
+            y = m_coefficients[3];
             for (int i = 0; i < x.Length; i++)
             {
-                y += m_coefficients[i + 1] * x[i];
+                y += m_coefficients[i] * x[i];
             }
         }
         return y;
+    }
+
+    // Predicts the speed of the player given their score, coin, and distance
+    public double PredictSpeed(double score, double coin, double distance)
+    {
+        // Add a 1 to the beginning of the input vector for the intercept term
+        double[] x = new double[] { 1, score, coin, distance };
+
+        // Compute the predicted output
+        double prediction = 0;
+        for (int j = 0; j < theta.Length; j++)
+        {
+            prediction += x[j] * theta[j];
+        }
+
+        return prediction;
     }
 
     public void CheckTest()

@@ -34,8 +34,9 @@ public class GameManager : MonoBehaviour
     static string filename = "";
     static bool running;
     static protected float speed;
+    static protected float testPredictedSpeed = 10f;
     static protected float score;
-    static protected int coins;
+    static protected float coins;
     static protected float distance;
     static protected bool ReRunning;
     protected float[] dataset;
@@ -43,6 +44,8 @@ public class GameManager : MonoBehaviour
 
     static protected float increment = 2f;
     static protected float maxSpeed = 50f;
+
+    protected bool DDA = false;
 
     protected void OnEnable()
     {
@@ -70,20 +73,34 @@ public class GameManager : MonoBehaviour
 
         // Name the file "/test.csv" and write the headings at the beginning
         filename = Application.dataPath + "/test.csv";
-        //filename = Application.dataPath + "/test2.csv";
-        //File.WriteAllText(filename, "Speed, Score, Coins, Total Distance" + System.Environment.NewLine);  
-        
-        File.ReadAllText(filename);
+        //File.AppendAllText(filename, "Speed, Score, Coins, Total Distance" + System.Environment.NewLine);  
+        //Debug.Log("Triggered file read = " + filename);
+        //File.ReadAllText(filename);
         
     }
 
     // Will do the saving function on every seconds declared
     static public IEnumerator saveRecord()
     {
+        MultipleLinearRegression instance = new MultipleLinearRegression();
+        instance.LoadDataFromCSV(filename);
         running = true;
         while (running)
         {
             recordTime();
+            
+            Debug.Log("Triggered speed = " + TrackManager.instance.speed);
+            
+            //function 1
+            // float[] dataset = new float[3];
+            // dataset[0] = speed;
+            // dataset[1] = score;
+            // dataset[2] = coins;
+            // Debug.Log("Triggered prediction = " + instance.PredictSpeed(speed,score,coins));
+            
+            // function 2
+            //Debug.Log("Triggered prediction = " + instance.PredictSpeed(speed,score,coins));
+            
             yield return new WaitForSeconds(10);
         }        
     }
@@ -107,6 +124,16 @@ public class GameManager : MonoBehaviour
     //        yield return new WaitForSeconds(2f);
     //    }
     //}
+    // protected IEnumerator ChangeSpeed()
+    // {
+    //     while (running)
+    //     {
+    //         // speed = regressionManager.Predict(dataset);
+    //         // speed = regressionManager.Predict(dataset);
+    //         // TrackManager.instance.predictedSpeed = testPredictedSpeed;
+    //         yield return new WaitForSeconds(2f);
+    //     }
+    // }
 
     protected void Start(){
         Debug.Log("Call Start "+ regressionManager);
@@ -218,7 +245,20 @@ public class GameManager : MonoBehaviour
     // Writes the values of the essential variables into the test file
     static public void WriteCSV()
     {
+        if(TrackManager.instance.speed == 10){
+            TrackManager.instance.predictedSpeed = 15;
+        }else {
+            TrackManager.instance.predictedSpeed = 10;
+        }
+        // StreamWriter reader = new StreamWriter(filename, true);
+        // reader.WriteLine(speed + "," + score + "," + coins + "," + distance + System.Environment.NewLine);
+        // reader.Close();
         File.AppendAllText(filename, speed + "," + score + "," + coins + "," + distance + System.Environment.NewLine);
+    }
+    public void ToggleDynamic(bool value)
+    {
+        Debug.Log("Dynamic toggled:" + value);
+        DDA = value;
     }
 
 }

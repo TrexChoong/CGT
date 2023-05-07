@@ -76,6 +76,7 @@ public class GameState : AState
     protected bool m_GameoverSelectionDone = false;
 
     protected int k_MaxLives = 3;
+    protected bool m_IsDynamic; //Training is the regular run where we gather information at different speeds.
 
     protected bool m_IsTutorial; //Tutorial is a special run that don't chance section until the tutorial step is "validated".
     protected int m_TutorialClearedObstacle = 0;
